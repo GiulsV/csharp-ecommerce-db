@@ -29,22 +29,49 @@ Il dipendente deve poter spedire gli ordini acquistati per cui il pagamento è a
 Console.WriteLine("E-commerce");
 
 ECommerceContext db = new ECommerceContext();
+
+
 bool scelta = false;
 while (!scelta)
 {
-    Console.Write("Scegli se sei un cliente [c] o un dipendente [d]");
+    Console.WriteLine("Scegli se sei un cliente [c] o un dipendente [d]");
     string choice = Console.ReadLine();
 
     switch (choice)
     {
         case "c":
-            Console.WriteLine("cliente");
-            scelta = true;
-            // visualizza articoli
-            // crea ordine
-            // modifica ordine
-            // elimina ordine
+            Console.WriteLine("Sei entrato come cliente");
+            Console.WriteLine();
+            
+            Console.WriteLine("Vuoi registrarti? [y/n]");
+            string login = Console.ReadLine();
+            if (login == "n")
+            {
+                break;
+            }
+            else
+            { 
+                //registra utente
+                addNewCustomer();
 
+                // visualizza articoli
+                Console.WriteLine("Vuoi visualizzare i prodotti? [y/n]");
+                string sino = Console.ReadLine();
+                if (sino == "y")
+                {
+                    int i = 0;
+                    foreach (Product product in ListProduct(db).ToList())
+                    {
+                        Console.WriteLine((i + 1) + " - " + product.Name);
+                        i++;
+                    }
+                }
+                scelta = true;
+
+                // crea ordine
+                // modifica ordine
+                // elimina ordine
+            }
             break;
         case "d":
             Console.WriteLine("dipendente");
@@ -55,4 +82,42 @@ while (!scelta)
             // crea pagamento
             break;
     }
+}
+
+
+List<Product> ListProduct(ECommerceContext db)
+{
+    List<Product> productList = db.Products.ToList<Product>();
+
+    return productList;
+}
+
+//registra utente
+void addNewCustomer()
+{
+    Console.WriteLine("Inserisci il nome");
+    string name = Console.ReadLine();
+    Console.WriteLine("Inserisci il Cognome");
+    string surname = Console.ReadLine();
+    Console.WriteLine("Inserisci l'email");
+    string email = Console.ReadLine();
+    bool check = false;
+
+    while (!check)
+    {
+        try
+        {
+            Customer newCustomer = new() { Name = name, Surname = surname, Email = email };
+            db.Add(newCustomer);
+            db.SaveChanges();
+            check = true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+            check = false;
+        }
+    }
+    string output = check ? "Inserimento avvenuto correttamente" : "";
+    Console.WriteLine(output);
 }
