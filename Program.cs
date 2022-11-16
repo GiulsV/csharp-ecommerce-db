@@ -27,6 +27,7 @@ Il dipendente deve poter spedire gli ordini acquistati per cui il pagamento è a
 //dipendente crea ordine e cliente lo compra/seleziona?
 
 Console.WriteLine("E-commerce");
+Console.WriteLine();
 
 ECommerceContext db = new ECommerceContext();
 
@@ -47,6 +48,7 @@ while (!scelta)
             string login = Console.ReadLine();
             if (login == "n")
             {
+                Console.WriteLine("Non puoi effettuare ordini se non sei registrato.");
                 break;
             }
             else
@@ -56,8 +58,8 @@ while (!scelta)
 
                 // visualizza articoli
                 Console.WriteLine("Vuoi visualizzare i prodotti? [y/n]");
-                string sino = Console.ReadLine();
-                if (sino == "y")
+                string yn = Console.ReadLine();
+                if (yn == "y")
                 {
                     int i = 0;
                     foreach (Product product in ListProduct(db).ToList())
