@@ -1,5 +1,5 @@
 ﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+//Console.WriteLine("Hello, World!");
 
 /*
  
@@ -11,6 +11,7 @@ Considerando che:
         - ci sono clienti che effettuano ordini.
         - Un ordine viene preparato da un dipendente.
         - Un ordine ha associato uno o più pagamenti (considerando eventuali tentativi falliti)
+
 Realizzate le seguenti funzionalità
         - inserite 10 prodotti all’avvio del programma (i prodotti non devono essere inseriti in caso si riavvi l’applicazione)
         - quando l’applicazione si avvia chiede se l’utente è un dipendete o un cliente
@@ -23,3 +24,33 @@ Il dipendente deve poter spedire gli ordini acquistati per cui il pagamento è a
 
  */
 
+Console.WriteLine("E-commerce");
+
+ECommerceContext db = new ECommerceContext();
+bool scelta = false;
+while (!scelta)
+{
+    Console.Write("Scegli se sei un cliente [c] o un dipendente [d]");
+    string choice = Console.ReadLine();
+
+    switch (choice)
+    {
+        case "c":
+            Console.WriteLine("cliente");
+            scelta = true;
+            // visualizza articoli
+            // crea ordine
+            // modifica ordine
+            // elimina ordine
+
+            break;
+        case "d":
+            Console.WriteLine("dipendente");
+            scelta = true;
+            // visualizza ordine
+            // modifica prodotti
+            // annulla ordine
+            // crea pagamento
+            break;
+    }
+}
