@@ -12,7 +12,7 @@ public class Order
     public int OrderId { get; set; }
     public DateTime Date { get; set; }
     public float Ammount { get; set; }
-    public string Status { get; set; }
+    public bool Status { get; set; }
 
     //relazioni
     public int CustomerId { get; set; }

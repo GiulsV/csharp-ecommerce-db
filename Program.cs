@@ -24,102 +24,189 @@ Il dipendente deve poter spedire gli ordini acquistati per cui il pagamento è a
 
  */
 
-//dipendente crea ordine e cliente lo compra/seleziona?
 
-Console.WriteLine("E-commerce");
-Console.WriteLine();
+ using System.Collections.Generic;
+
+Console.WriteLine("Benvenuto nell'ecommerce!");
 
 ECommerceContext db = new ECommerceContext();
 
+bool exit = true;
 
-bool scelta = false;
-while (!scelta)
+do
 {
-    Console.WriteLine("Scegli se sei un cliente [c] o un dipendente [d]");
-    string choice = Console.ReadLine();
 
-    switch (choice)
+    Console.Write("Inserisci se sei un dipendente [d] o un cliente [c] ");
+    string input = Console.ReadLine();
+
+
+    switch (input)
     {
-        case "c":
-            Console.WriteLine("Sei entrato come cliente");
-            Console.WriteLine();
-            
-            Console.WriteLine("Vuoi registrarti? [y/n]");
-            string login = Console.ReadLine();
-            if (login == "n")
-            {
-                Console.WriteLine("Non puoi effettuare ordini se non sei registrato.");
-                break;
-            }
-            else
-            { 
-                //registra utente
-                addNewCustomer();
-
-                // visualizza articoli
-                Console.WriteLine("Vuoi visualizzare i prodotti? [y/n]");
-                string yn = Console.ReadLine();
-                if (yn == "y")
-                {
-                    int i = 0;
-                    foreach (Product product in ListProduct(db).ToList())
-                    {
-                        Console.WriteLine((i + 1) + " - " + product.Name);
-                        i++;
-                    }
-                }
-                scelta = true;
-
-                // crea ordine
-                // modifica ordine
-                // elimina ordine
-            }
-            break;
         case "d":
-            Console.WriteLine("dipendente");
-            scelta = true;
-            // visualizza ordine
-            // modifica prodotti
-            // annulla ordine
-            // crea pagamento
+
+            bool exitEmployee = true;
+            do
+            {
+                // leggi ordine (read)
+                List<Order> ordini = db.Orders.ToList();
+                foreach(Order order in ordini)
+                {
+                    Console.WriteLine("{0} - {1} - {2}", order.Date, order.Ammount, order.Status);
+                }
+                // modifica ordine (update)
+
+                // cancella ordine (delete)
+
+                // crea pagamento (create)
+                Pagamento(db, ordini);
+
+            } while (!exitEmployee);
+            
             break;
+
+        case "c":
+
+            //            
+            int i = 0;
+            foreach (Product product in ProductList(db).ToList())
+            {
+                Console.WriteLine((i + 1) + " - " + product.Name);
+                i++;
+            }
+
+            MenuCustomer();
+
+            Console.Write("Scegli un'opzione del menu: ");
+            int choice = Convert.ToInt32(Console.ReadLine());
+
+            bool exitClient = false;
+            do
+            {
+                switch (choice)
+                {
+
+
+                    // crea ordine (create)
+                    case 1:
+
+                        //scegli il prodotto
+                        Console.Write("Scegli il nome del prodotto che vuoi ordinare: ");
+                        string nomeProdotto = Console.ReadLine();
+
+                        //funzione crea ordine con parametro db 
+                        CreaOrdine(db, nomeProdotto);
+
+
+                        break;
+
+                    case 2:
+                        List<Product> products = ProductList(db);
+
+                        i = 0;
+                        foreach (Product product in products)
+                        {
+                            Console.WriteLine((i + 1) + " - " + product.Name);
+                            i++;
+                        }
+                        break;
+
+                    // modifica ordine (update)
+                    case 3:
+
+                        ModifyOrder(db);
+
+                        break;
+
+                    // elimina ordine (delete)
+                    case 4:
+                        Customer customer = db.Customers.First();
+                        Order ordine = db.Orders.Where(ordine => ordine.CustomerId == customer.CustomerId).First();
+
+                        db.Remove(ordine);
+                        break;
+
+                    case 5:
+                        exitClient = true;
+                        break;
+
+                    
+
+                }
+            } while (!exitClient);
+
+            break;
+
+        case "esci":
+            exit = false;
+            break;
+
     }
+
+} while (!exit);
+
+
+void MenuCustomer()
+{
+    Console.WriteLine("Sezione: Lista Prodottis\n");
+    Console.WriteLine("     1. Crea ordine");
+    Console.WriteLine("     2. Lista Prodotti");
+    Console.WriteLine("     3. Modifica ordine");
+    Console.WriteLine("     4. Elimina ordine");
+    Console.WriteLine("     5. Esci");
 }
 
-
-List<Product> ListProduct(ECommerceContext db)
+List<Product> ProductList(ECommerceContext db)
 {
     List<Product> productList = db.Products.ToList<Product>();
 
     return productList;
 }
 
-//registra utente
-void addNewCustomer()
+void CreaOrdine(ECommerceContext db, string nomeProdotto)
 {
-    Console.WriteLine("Inserisci il nome");
-    string name = Console.ReadLine();
-    Console.WriteLine("Inserisci il Cognome");
-    string surname = Console.ReadLine();
-    Console.WriteLine("Inserisci l'email");
-    string email = Console.ReadLine();
-    bool check = false;
+    // trovare il prodotto
+    Product product = db.Products.Where(p => p.Name == nomeProdotto).First();
 
-    while (!check)
-    {
-        try
-        {
-            Customer newCustomer = new() { Name = name, Surname = surname, Email = email };
-            db.Add(newCustomer);
-            db.SaveChanges();
-            check = true;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex.Message);
-            check = false;
-        }
-    }
-    string output = check ? "Inserimento avvenuto correttamente" : "";
-    Console.WriteLine(output);
+    //dati utente
+    Customer customer = db.Customers.First();
+
+    //dati impiegato
+    Employee employee = db.Employees.First();
+
+    int random = new Random().Next(0, 2);
+    bool stato = false;
+    if (random == 1)
+        stato = true;
+
+    //creare ordine
+    Order order = new Order() { Date = new DateTime(), Ammount = product.Price, Status = stato, EmployeeId = employee.EmployeeId, CustomerId = customer.CustomerId };
+    db.Orders.Add(order);
+    db.SaveChanges();
+}
+
+List<Order> OrderList(ECommerceContext db)
+{
+    List<Order> orders = db.Orders.ToList();
+
+    return orders;
+}
+
+void Pagamento(ECommerceContext db, List<Order> ordini)
+{
+    int random = new Random().Next(1, 11);
+    bool stato = false;
+    if (random < 6)
+        stato = true;
+    Payment payment = new Payment() { OrderId = ordini.First().OrderId, Date = ordini.First().Date, Ammount = ordini.First().Ammount, Status = stato };
+    db.Payments.Add(payment);
+    db.SaveChanges();
+}
+
+void ModifyOrder(ECommerceContext db)
+{
+    Customer customer = db.Customers.First();
+    Order ordine = db.Orders.Where(ordine => ordine.CustomerId == customer.CustomerId).First();
+
+    ordine.Ammount = 3000;
+    db.SaveChanges();
 }
