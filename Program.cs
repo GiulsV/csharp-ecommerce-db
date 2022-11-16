@@ -24,6 +24,8 @@ Il dipendente deve poter spedire gli ordini acquistati per cui il pagamento è a
 
  */
 
+//dipendente crea ordine e cliente lo compra/seleziona?
+
 Console.WriteLine("E-commerce");
 
 ECommerceContext db = new ECommerceContext();
